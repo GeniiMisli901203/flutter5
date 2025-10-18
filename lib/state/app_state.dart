@@ -53,6 +53,7 @@ class AppState extends ChangeNotifier {
         description: 'Алгебра и начала анализа. Тема: Производная функции.',
         homework: 'Учебник: стр. 45-48, № 125-130',
         materials: 'Учебник, тетрадь, калькулятор',
+        dayOfWeek: 0,
       ),
       Lesson(
         id: '2',
@@ -63,6 +64,7 @@ class AppState extends ChangeNotifier {
         description: 'Русская литература XIX века. Тема: Творчество А.С. Пушкина.',
         homework: 'Прочитать "Евгений Онегин" главы 1-2',
         materials: 'Учебник, тетрадь, хрестоматия',
+        dayOfWeek: 0,
       ),
       Lesson(
         id: '3',
@@ -73,6 +75,7 @@ class AppState extends ChangeNotifier {
         description: 'Механика. Тема: Законы Ньютона.',
         homework: 'Решить задачи на стр. 78-80',
         materials: 'Учебник, тетрадь, лабораторное оборудование',
+        dayOfWeek: 0,
       ),
     ],
     // Вторник
@@ -86,6 +89,7 @@ class AppState extends ChangeNotifier {
         description: 'Всемирная история. Тема: Эпоха Возрождения.',
         homework: 'Подготовить доклад о Леонардо да Винчи',
         materials: 'Учебник, атлас, контурные карты',
+        dayOfWeek: 1,
       ),
       Lesson(
         id: '5',
@@ -96,6 +100,7 @@ class AppState extends ChangeNotifier {
         description: 'Общая химия. Тема: Периодическая система химических элементов.',
         homework: 'Учебник: стр. 56-59, № 10-15',
         materials: 'Учебник, тетрадь, таблица Менделеева',
+        dayOfWeek: 1,
       ),
       Lesson(
         id: '6',
@@ -106,6 +111,7 @@ class AppState extends ChangeNotifier {
         description: 'Грамматика. Тема: Времена группы Perfect.',
         homework: 'Учебник: стр. 89-92, упражнения 1-5',
         materials: 'Учебник, тетрадь, словарь',
+        dayOfWeek: 1,
       ),
     ],
     // Среда
@@ -119,6 +125,7 @@ class AppState extends ChangeNotifier {
         description: 'Ботаника. Тема: Строение растений.',
         homework: 'Учебник: стр. 72-75, вопросы 1-10',
         materials: 'Учебник, тетрадь, гербарий',
+        dayOfWeek: 2,
       ),
       Lesson(
         id: '8',
@@ -129,6 +136,7 @@ class AppState extends ChangeNotifier {
         description: 'Физическая география. Тема: Климатические пояса Земли.',
         homework: 'Подготовить сообщение о климате Африки',
         materials: 'Учебник, атлас, контурные карты',
+        dayOfWeek: 2,
       ),
       Lesson(
         id: '9',
@@ -139,6 +147,7 @@ class AppState extends ChangeNotifier {
         description: 'Общая физическая подготовка. Тема: Легкая атлетика.',
         homework: 'Тренировка на выносливость',
         materials: 'Спортивная форма, кроссовки',
+        dayOfWeek: 2,
       ),
     ],
     // Четверг
@@ -152,6 +161,7 @@ class AppState extends ChangeNotifier {
         description: 'Основы программирования. Тема: Циклы в языке Python.',
         homework: 'Написать программу для вычисления факториала числа',
         materials: 'Компьютер, тетрадь',
+        dayOfWeek: 3,
       ),
       Lesson(
         id: '11',
@@ -162,6 +172,7 @@ class AppState extends ChangeNotifier {
         description: 'Синтаксис и пунктуация. Тема: Сложноподчиненные предложения.',
         homework: 'Учебник: стр. 112-115, упражнения 200-205',
         materials: 'Учебник, тетрадь',
+        dayOfWeek: 3,
       ),
     ],
     // Пятница
@@ -175,6 +186,7 @@ class AppState extends ChangeNotifier {
         description: 'Право. Тема: Конституция Российской Федерации.',
         homework: 'Подготовить презентацию о правах и обязанностях граждан',
         materials: 'Учебник, тетрадь, Конституция РФ',
+        dayOfWeek: 4,
       ),
       Lesson(
         id: '13',
@@ -185,6 +197,7 @@ class AppState extends ChangeNotifier {
         description: 'Рисование. Тема: Натюрморт.',
         homework: 'Нарисовать натюрморт с натуры',
         materials: 'Альбом, карандаши, краски',
+        dayOfWeek: 4,
       ),
     ],
   ];
@@ -221,5 +234,78 @@ class AppState extends ChangeNotifier {
   void addNews(NewsItem newsItem) {
     _news.insert(0, newsItem);
     notifyListeners();
+  }
+
+  // Методы для работы с уроками
+  void addLesson(Lesson lesson) {
+    final day = lesson.dayOfWeek.clamp(0, 4);
+    _lessonsByDay[day].add(lesson);
+    _sortLessonsByTime(day);
+    notifyListeners();
+  }
+
+  void updateLesson(Lesson updatedLesson) {
+    final day = updatedLesson.dayOfWeek.clamp(0, 4);
+
+    // Если день изменился, перемещаем урок
+    if (_isEditingDifferentDay(updatedLesson)) {
+      _moveLessonToDifferentDay(updatedLesson);
+    } else {
+      // Обновляем урок в том же дне
+      final index = _lessonsByDay[day].indexWhere((lesson) => lesson.id == updatedLesson.id);
+      if (index != -1) {
+        _lessonsByDay[day][index] = updatedLesson;
+        _sortLessonsByTime(day);
+      }
+    }
+    notifyListeners();
+  }
+
+  void deleteLesson(String lessonId) {
+    for (int day = 0; day < _lessonsByDay.length; day++) {
+      _lessonsByDay[day].removeWhere((lesson) => lesson.id == lessonId);
+    }
+    notifyListeners();
+  }
+
+  bool _isEditingDifferentDay(Lesson updatedLesson) {
+    for (int day = 0; day < _lessonsByDay.length; day++) {
+      final existingLessonIndex = _lessonsByDay[day].indexWhere((lesson) => lesson.id == updatedLesson.id);
+      if (existingLessonIndex != -1 && _lessonsByDay[day][existingLessonIndex].dayOfWeek != updatedLesson.dayOfWeek) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  void _moveLessonToDifferentDay(Lesson updatedLesson) {
+    // Удаляем из старого дня
+    for (int day = 0; day < _lessonsByDay.length; day++) {
+      _lessonsByDay[day].removeWhere((lesson) => lesson.id == updatedLesson.id);
+    }
+
+    // Добавляем в новый день
+    final newDay = updatedLesson.dayOfWeek.clamp(0, 4);
+    _lessonsByDay[newDay].add(updatedLesson);
+    _sortLessonsByTime(newDay);
+  }
+
+  void _sortLessonsByTime(int day) {
+    _lessonsByDay[day].sort((a, b) {
+      final aStart = a.time.split('-').first;
+      final bStart = b.time.split('-').first;
+      return aStart.compareTo(bStart);
+    });
+  }
+
+  Lesson? getLessonById(String id) {
+    for (final dayLessons in _lessonsByDay) {
+      try {
+        return dayLessons.firstWhere((lesson) => lesson.id == id);
+      } catch (e) {
+        continue;
+      }
+    }
+    return null;
   }
 }

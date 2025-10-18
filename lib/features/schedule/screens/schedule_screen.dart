@@ -1,22 +1,44 @@
 import 'package:flutter/material.dart';
 import '../models/lesson.dart';
 import 'lesson_detail_screen.dart';
+import 'lesson_edit_screen.dart';
 
 class ScheduleScreen extends StatelessWidget {
   final List<Lesson> lessons;
   final int selectedDay;
   final Function(int) onDaySelected;
+  final Function(Lesson) onAddLesson;
+  final Function(Lesson) onEditLesson;
+  final Function(String) onDeleteLesson;
 
   const ScheduleScreen({
+    Key? key,
     required this.lessons,
     required this.selectedDay,
     required this.onDaySelected,
-  });
+    required this.onAddLesson,
+    required this.onEditLesson,
+    required this.onDeleteLesson,
+  }) : super(key: key);
 
   void _showLessonDetails(BuildContext context, Lesson lesson) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => LessonDetailScreen(lesson: lesson),
+        builder: (context) => LessonDetailScreen(
+          lesson: lesson,
+          onEdit: onEditLesson,
+          onDelete: onDeleteLesson,
+        ),
+      ),
+    );
+  }
+
+  void _addNewLesson(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => LessonEditScreen(
+          onSave: onAddLesson,
+        ),
       ),
     );
   }
@@ -110,6 +132,11 @@ class ScheduleScreen extends StatelessWidget {
                       'Нет уроков на выбранный день',
                       style: TextStyle(fontSize: 14, color: Colors.grey),
                     ),
+                    SizedBox(height: 8),
+                    ElevatedButton(
+                      onPressed: () => _addNewLesson(context),
+                      child: Text('Добавить первый урок'),
+                    ),
                   ],
                 ),
               )
@@ -188,6 +215,12 @@ class ScheduleScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _addNewLesson(context),
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+        child: Icon(Icons.add),
       ),
     );
   }

@@ -16,7 +16,6 @@ class AnimatedLessonCard extends StatelessWidget {
       duration: Duration(milliseconds: 500 + (index * 100)),
       curve: Curves.easeInOut,
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      transform: Matrix4.translationValues(0, 0, 0),
       child: Card(
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

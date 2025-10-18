@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'state/app_state.dart';
 import 'features/schedule/screens/schedule_screen.dart';
-import 'features/news/screens/news_screen.dart'; // Убедись, что путь корректный
+import 'features/news/screens/news_screen.dart';
 import 'features/profile/screens/profile_screen.dart';
 import 'shared/widgets/bottom_nav_bar.dart';
 
@@ -29,6 +29,9 @@ class App extends StatelessWidget {
                   lessons: appState.lessons,
                   selectedDay: appState.selectedDay,
                   onDaySelected: appState.setDay,
+                  onAddLesson: appState.addLesson,
+                  onEditLesson: appState.updateLesson,
+                  onDeleteLesson: appState.deleteLesson,
                 );
               case AppScreen.profile:
                 return ProfileScreen(
@@ -41,6 +44,9 @@ class App extends StatelessWidget {
                   lessons: appState.lessons,
                   selectedDay: appState.selectedDay,
                   onDaySelected: appState.setDay,
+                  onAddLesson: appState.addLesson,
+                  onEditLesson: appState.updateLesson,
+                  onDeleteLesson: appState.deleteLesson,
                 );
             }
           },

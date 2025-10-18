@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 import '../models/lesson.dart';
+import 'lesson_edit_screen.dart';
 
 class LessonDetailScreen extends StatelessWidget {
   final Lesson lesson;
+  final Function(Lesson)? onEdit;
+  final Function(String)? onDelete;
 
-  const LessonDetailScreen({required this.lesson});
+  const LessonDetailScreen({
+    Key? key,
+    required this.lesson,
+    this.onEdit,
+    this.onDelete,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -13,6 +21,23 @@ class LessonDetailScreen extends StatelessWidget {
         title: Text('Подробности урока'),
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
+        actions: [
+          if (onEdit != null)
+            IconButton(
+              icon: Icon(Icons.edit),
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => LessonEditScreen(
+                      lesson: lesson,
+                      onSave: onEdit!,
+                      onDelete: onDelete,
+                    ),
+                  ),
+                );
+              },
+            ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16),
