@@ -38,6 +38,7 @@ class App extends StatelessWidget {
                   studentName: 'Иван Иванов',
                   studentClass: '10-А',
                   avatarUrl: 'https://via.placeholder.com/150/0077ff/ffffff?text=ИИ',
+                  appState: appState,
                 );
               default:
                 return ScheduleScreen(

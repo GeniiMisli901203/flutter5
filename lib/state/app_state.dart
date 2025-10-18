@@ -4,6 +4,22 @@ import '../features/news/models/news_item.dart';
 
 enum AppScreen { news, schedule, profile }
 
+class StudentProfile {
+  final String name;
+  final String className;
+  final String email;
+  final String phoneNumber;
+  final String avatarUrl;
+
+  StudentProfile({
+    required this.name,
+    required this.className,
+    required this.email,
+    required this.phoneNumber,
+    required this.avatarUrl,
+  });
+}
+
 class AppState extends ChangeNotifier {
   AppScreen _currentScreen = AppScreen.schedule;
   int _selectedDay = 0;
@@ -202,10 +218,20 @@ class AppState extends ChangeNotifier {
     ],
   ];
 
+  StudentProfile _studentProfile = StudentProfile(
+    name: 'Иван Иванов',
+    className: '9А',
+    email: 'ivanov@school123.ru',
+    phoneNumber: '+7 (999) 123-45-67',
+    avatarUrl:
+    'https://example.com/avatar.jpg', // Замените на реальный URL аватара
+  );
+
   AppScreen get currentScreen => _currentScreen;
   int get selectedDay => _selectedDay;
   List<NewsItem> get news => _news;
   List<Lesson> get lessons => _lessonsByDay[_selectedDay];
+  StudentProfile get studentProfile => _studentProfile;
 
   void setScreen(AppScreen screen) {
     if (_currentScreen != screen) {
@@ -307,5 +333,21 @@ class AppState extends ChangeNotifier {
       }
     }
     return null;
+  }
+
+  void updateStudentProfile({
+    String? name,
+    String? className,
+    String? email,
+    String? phoneNumber,
+  }) {
+    _studentProfile = StudentProfile(
+      name: name ?? _studentProfile.name,
+      className: className ?? _studentProfile.className,
+      email: email ?? _studentProfile.email,
+      phoneNumber: phoneNumber ?? _studentProfile.phoneNumber,
+      avatarUrl: _studentProfile.avatarUrl,
+    );
+    notifyListeners();
   }
 }

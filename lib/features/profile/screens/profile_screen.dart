@@ -1,15 +1,22 @@
+// lib/features/profile/screens/profile_screen.dart
 import 'package:flutter/material.dart';
+
+import '../../../state/app_state.dart';
+
 
 class ProfileScreen extends StatelessWidget {
   final String studentName;
   final String studentClass;
   final String avatarUrl;
+  final AppState appState;
 
   const ProfileScreen({
     required this.studentName,
     required this.studentClass,
     required this.avatarUrl,
-  });
+    required this.appState,
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -18,14 +25,22 @@ class ProfileScreen extends StatelessWidget {
         title: Text('Профиль'),
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.edit),
+            onPressed: () {
+              _showEditProfileDialog(context);
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Container(
-          width: double.infinity, // Занимает всю ширину
+          width: double.infinity,
           padding: EdgeInsets.all(24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center, // Центрирование по горизонтали
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Аватар
               Container(
@@ -141,6 +156,65 @@ class ProfileScreen extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  void _showEditProfileDialog(BuildContext context) {
+    final profile = appState.studentProfile;
+
+    TextEditingController nameController =
+    TextEditingController(text: profile.name);
+    TextEditingController classController =
+    TextEditingController(text: profile.className);
+    TextEditingController emailController =
+    TextEditingController(text: profile.email);
+    TextEditingController phoneController =
+    TextEditingController(text: profile.phoneNumber);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Редактировать профиль'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: InputDecoration(labelText: 'Имя'),
+            ),
+            TextField(
+              controller: classController,
+              decoration: InputDecoration(labelText: 'Класс'),
+            ),
+            TextField(
+              controller: emailController,
+              decoration: InputDecoration(labelText: 'Email'),
+            ),
+            TextField(
+              controller: phoneController,
+              decoration: InputDecoration(labelText: 'Телефон'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: Navigator.of(context).pop,
+            child: Text('Отмена'),
+          ),
+          TextButton(
+            onPressed: () {
+              appState.updateStudentProfile(
+                name: nameController.text,
+                className: classController.text,
+                email: emailController.text,
+                phoneNumber: phoneController.text,
+              );
+              Navigator.of(context).pop();
+            },
+            child: Text('Сохранить'),
+          ),
+        ],
+      ),
     );
   }
 }
