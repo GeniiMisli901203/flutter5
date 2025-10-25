@@ -230,7 +230,10 @@ class AppState extends ChangeNotifier {
   AppScreen get currentScreen => _currentScreen;
   int get selectedDay => _selectedDay;
   List<NewsItem> get news => _news;
-  List<Lesson> get lessons => _lessonsByDay[_selectedDay];
+  List<Lesson> get allLessons => _lessonsByDay.expand((dayLessons) => dayLessons).toList();
+
+// Получаем уроки для выбранного дня
+  List<Lesson> get lessonsForSelectedDay => _lessonsByDay[_selectedDay];
   StudentProfile get studentProfile => _studentProfile;
 
   void setScreen(AppScreen screen) {

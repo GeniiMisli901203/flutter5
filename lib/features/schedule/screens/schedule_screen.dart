@@ -3,7 +3,7 @@ import '../models/lesson.dart';
 import 'lesson_detail_screen.dart';
 import 'lesson_edit_screen.dart';
 
-class ScheduleScreen extends StatelessWidget {
+class ScheduleScreen extends StatefulWidget {
   final List<Lesson> lessons;
   final int selectedDay;
   final Function(int) onDaySelected;
@@ -21,13 +21,37 @@ class ScheduleScreen extends StatelessWidget {
     required this.onDeleteLesson,
   }) : super(key: key);
 
+  @override
+  _ScheduleScreenState createState() => _ScheduleScreenState();
+}
+
+class _ScheduleScreenState extends State<ScheduleScreen> {
+  late int _currentSelectedDay;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentSelectedDay = widget.selectedDay;
+  }
+
+  @override
+  void didUpdateWidget(ScheduleScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Обновляем локальное состояние при изменении пропсов
+    if (widget.selectedDay != oldWidget.selectedDay) {
+      setState(() {
+        _currentSelectedDay = widget.selectedDay;
+      });
+    }
+  }
+
   void _showLessonDetails(BuildContext context, Lesson lesson) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => LessonDetailScreen(
           lesson: lesson,
-          onEdit: onEditLesson,
-          onDelete: onDeleteLesson,
+          onEdit: widget.onEditLesson,
+          onDelete: widget.onDeleteLesson,
         ),
       ),
     );
@@ -37,7 +61,7 @@ class ScheduleScreen extends StatelessWidget {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => LessonEditScreen(
-          onSave: onAddLesson,
+          onSave: widget.onAddLesson,
           onSuccess: () {
             print('Урок успешно добавлен');
           },
@@ -46,10 +70,20 @@ class ScheduleScreen extends StatelessWidget {
     );
   }
 
+  void _handleDaySelected(int dayIndex) {
+    setState(() {
+      _currentSelectedDay = dayIndex;
+    });
+    widget.onDaySelected(dayIndex);
+  }
+
   @override
   Widget build(BuildContext context) {
     final days = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница'];
     final shortDays = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ'];
+
+    // Фильтруем уроки для выбранного дня
+    final filteredLessons = widget.lessons.where((lesson) => lesson.dayOfWeek == _currentSelectedDay).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -75,24 +109,24 @@ class ScheduleScreen extends StatelessWidget {
                 return Container(
                   margin: EdgeInsets.only(right: 8),
                   child: ElevatedButton(
-                    onPressed: () => onDaySelected(index),
+                    onPressed: () => _handleDaySelected(index),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: selectedDay == index
+                      backgroundColor: _currentSelectedDay == index
                           ? Colors.blue
                           : Colors.white,
-                      foregroundColor: selectedDay == index
+                      foregroundColor: _currentSelectedDay == index
                           ? Colors.white
                           : Colors.blue,
                       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                         side: BorderSide(
-                          color: selectedDay == index
+                          color: _currentSelectedDay == index
                               ? Colors.blue
                               : Colors.blue.withOpacity(0.3),
                         ),
                       ),
-                      elevation: selectedDay == index ? 2 : 0,
+                      elevation: _currentSelectedDay == index ? 2 : 0,
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -124,7 +158,7 @@ class ScheduleScreen extends StatelessWidget {
           Expanded(
             child: Container(
               margin: EdgeInsets.only(bottom: 5),
-              child: lessons.isEmpty
+              child: filteredLessons.isEmpty
                   ? Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -145,9 +179,9 @@ class ScheduleScreen extends StatelessWidget {
               )
                   : ListView.builder(
                 padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                itemCount: lessons.length,
+                itemCount: filteredLessons.length,
                 itemBuilder: (context, index) {
-                  final lesson = lessons[index];
+                  final lesson = filteredLessons[index];
                   return Container(
                     margin: EdgeInsets.only(bottom: 8),
                     child: Card(

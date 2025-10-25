@@ -48,7 +48,7 @@ class AppRouter {
               pageBuilder: (context, state) => NoTransitionPage(
                 key: state.pageKey,
                 child: ScheduleScreen(
-                  lessons: appState.lessons,
+                  lessons: appState.allLessons, // ← Передаем ВСЕ уроки
                   selectedDay: appState.selectedDay,
                   onDaySelected: appState.setDay,
                   onAddLesson: appState.addLesson,

@@ -6,7 +6,7 @@ class LessonEditScreen extends StatefulWidget {
   final Lesson? lesson;
   final Function(Lesson) onSave;
   final Function(String)? onDelete;
-  final VoidCallback? onSuccess; // ← Добавляем колбэк для успешного сохранения
+  final VoidCallback? onSuccess;
 
   const LessonEditScreen({
     Key? key,
@@ -78,18 +78,13 @@ class _LessonEditScreenState extends State<LessonEditScreen> {
       );
 
       widget.onSave(lesson);
+      widget.onSuccess?.call();
 
-      if (widget.onSuccess != null) {
-        widget.onSuccess!();
-      }
-
+      // Переходим на экран успеха
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => _SuccessScreen(
             message: _isEditing ? 'Урок обновлен!' : 'Урок добавлен!',
-            onContinue: () {
-              Navigator.of(context).pop();
-            },
           ),
         ),
       );
@@ -111,15 +106,12 @@ class _LessonEditScreenState extends State<LessonEditScreen> {
             TextButton(
               onPressed: () {
                 widget.onDelete!(widget.lesson!.id);
-                // ЗАМЕНА: после удаления показываем экран успеха
                 Navigator.of(context).pop(); // закрываем диалог
+                // Переходим на экран успеха удаления
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
                     builder: (context) => _SuccessScreen(
                       message: 'Урок удален!',
-                      onContinue: () {
-                        Navigator.of(context).pop();
-                      },
                     ),
                   ),
                 );
@@ -141,6 +133,7 @@ class _LessonEditScreenState extends State<LessonEditScreen> {
         title: Text(_isEditing ? 'Редактировать урок' : 'Добавить урок'),
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
+        automaticallyImplyLeading: false, // ← УБИРАЕМ кнопку назад
         actions: [
           if (_isEditing && widget.onDelete != null)
             IconButton(
@@ -295,17 +288,7 @@ class _LessonEditScreenState extends State<LessonEditScreen> {
                   ),
                 ],
               ),
-              SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: Text('Отмена'),
-                    ),
-                  ),
-                ],
-              ),
+              // ← УБИРАЕМ кнопку "Отмена" полностью
             ],
           ),
         ),
@@ -317,11 +300,9 @@ class _LessonEditScreenState extends State<LessonEditScreen> {
 // Экран успешного выполнения операции
 class _SuccessScreen extends StatelessWidget {
   final String message;
-  final VoidCallback onContinue;
 
   const _SuccessScreen({
     required this.message,
-    required this.onContinue,
   });
 
   @override
@@ -331,7 +312,7 @@ class _SuccessScreen extends StatelessWidget {
         title: Text('Успех'),
         backgroundColor: Colors.green,
         foregroundColor: Colors.white,
-        automaticallyImplyLeading: false, // Убираем кнопку назад
+        automaticallyImplyLeading: false,
       ),
       body: Center(
         child: Padding(
@@ -365,7 +346,10 @@ class _SuccessScreen extends StatelessWidget {
               ),
               SizedBox(height: 32),
               ElevatedButton(
-                onPressed: onContinue,
+                onPressed: () {
+                  // Просто закрываем экран успеха - вернемся к расписанию
+                  Navigator.of(context).pop();
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                   foregroundColor: Colors.white,

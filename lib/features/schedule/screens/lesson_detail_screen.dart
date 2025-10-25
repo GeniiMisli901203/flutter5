@@ -14,6 +14,10 @@ class LessonDetailScreen extends StatelessWidget {
     this.onDelete,
   }) : super(key: key);
 
+  void _goBack(BuildContext context) {
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,6 +25,10 @@ class LessonDetailScreen extends StatelessWidget {
         title: Text('Подробности урока'),
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => _goBack(context),
+        ),
         actions: [
           if (onEdit != null)
             IconButton(
@@ -121,6 +129,21 @@ class LessonDetailScreen extends StatelessWidget {
               Icons.school,
               lesson.materials.isNotEmpty ? lesson.materials : 'Специальные материалы не требуются',
               color: Colors.green,
+            ),
+
+            // Дополнительная кнопка "Назад" внизу экрана
+            SizedBox(height: 20),
+            Center(
+              child: ElevatedButton.icon(
+                onPressed: () => _goBack(context), // ← ЯВНЫЙ POP
+                icon: Icon(Icons.arrow_back),
+                label: Text('Вернуться к расписанию'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                ),
+              ),
             ),
           ],
         ),
