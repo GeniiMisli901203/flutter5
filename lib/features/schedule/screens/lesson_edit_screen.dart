@@ -6,12 +6,14 @@ class LessonEditScreen extends StatefulWidget {
   final Lesson? lesson;
   final Function(Lesson) onSave;
   final Function(String)? onDelete;
+  final VoidCallback? onSuccess; // ← Добавляем колбэк для успешного сохранения
 
   const LessonEditScreen({
     Key? key,
     this.lesson,
     required this.onSave,
     this.onDelete,
+    this.onSuccess,
   }) : super(key: key);
 
   @override
@@ -76,7 +78,21 @@ class _LessonEditScreenState extends State<LessonEditScreen> {
       );
 
       widget.onSave(lesson);
-      Navigator.of(context).pop();
+
+      if (widget.onSuccess != null) {
+        widget.onSuccess!();
+      }
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => _SuccessScreen(
+            message: _isEditing ? 'Урок обновлен!' : 'Урок добавлен!',
+            onContinue: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ),
+      );
     }
   }
 
@@ -95,9 +111,18 @@ class _LessonEditScreenState extends State<LessonEditScreen> {
             TextButton(
               onPressed: () {
                 widget.onDelete!(widget.lesson!.id);
-                Navigator.of(context)
-                  ..pop()
-                  ..pop();
+                // ЗАМЕНА: после удаления показываем экран успеха
+                Navigator.of(context).pop(); // закрываем диалог
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => _SuccessScreen(
+                      message: 'Урок удален!',
+                      onContinue: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ),
+                );
               },
               child: Text('Удалить', style: TextStyle(color: Colors.red)),
             ),
@@ -280,6 +305,73 @@ class _LessonEditScreenState extends State<LessonEditScreen> {
                     ),
                   ),
                 ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// Экран успешного выполнения операции
+class _SuccessScreen extends StatelessWidget {
+  final String message;
+  final VoidCallback onContinue;
+
+  const _SuccessScreen({
+    required this.message,
+    required this.onContinue,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Успех'),
+        backgroundColor: Colors.green,
+        foregroundColor: Colors.white,
+        automaticallyImplyLeading: false, // Убираем кнопку назад
+      ),
+      body: Center(
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.check_circle,
+                color: Colors.green,
+                size: 80,
+              ),
+              SizedBox(height: 24),
+              Text(
+                message,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green[800],
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 16),
+              Text(
+                'Операция выполнена успешно',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey[600],
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 32),
+              ElevatedButton(
+                onPressed: onContinue,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                ),
+                child: Text('Продолжить'),
               ),
             ],
           ),

@@ -38,6 +38,9 @@ class ScheduleScreen extends StatelessWidget {
       MaterialPageRoute(
         builder: (context) => LessonEditScreen(
           onSave: onAddLesson,
+          onSuccess: () {
+            print('Урок успешно добавлен');
+          },
         ),
       ),
     );

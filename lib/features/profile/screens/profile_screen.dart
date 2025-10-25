@@ -1,4 +1,5 @@
 // lib/features/profile/screens/profile_screen.dart
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../../state/app_state.dart';
@@ -42,27 +43,49 @@ class ProfileScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Аватар
-              Container(
-                width: 120,
-                height: 120,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.blue, width: 3),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.blue.withOpacity(0.3),
-                      blurRadius: 10,
-                      spreadRadius: 2,
+              CachedNetworkImage(
+                  imageUrl: 'https://yt3.googleusercontent.com/vgi-AL9ssRi0KYHfCgERa955Nm2q6gVbsFmDqQPhsptU4hgc1g3dyRazdc6wlefzLBrNlo9-MA=s900-c-k-c0x00ffffff-no-rj',
+                imageBuilder: (context, imageProvider) => Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.blue, width: 3),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.blue.withOpacity(0.3),
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                    image: DecorationImage(
+                      image: imageProvider,
+                      fit: BoxFit.cover,
                     ),
-                  ],
+                  ),
                 ),
-                child: CircleAvatar(
-                  backgroundImage: NetworkImage(avatarUrl),
+                placeholder: (context, url) => Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.blue, width: 3),
+                    color: Colors.grey[300],
+                  ),
+                  child: Icon(Icons.person_outline, size: 60,color: Colors.blue),
+                ),
+                errorWidget: (context, url, error) => Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.blue, width: 3),
+                    color: Colors.grey[300],
+                  ),
+                  child: Icon(Icons.error_outline, size: 60, color: Colors.red),
                 ),
               ),
               SizedBox(height: 32),
-
               // Имя ученика
               Text(
                 studentName,
@@ -104,11 +127,13 @@ class ProfileScreen extends StatelessWidget {
                   padding: EdgeInsets.all(20),
                   child: Column(
                     children: [
-                      _buildInfoRow(Icons.school, 'Школа №123', 'С углубленным изучением математики'),
+                      _buildInfoRow('https://i.pinimg.com/736x/c2/16/d2/c216d2e11724197af3fa7414c47ea1a0.jpg', 'О себе', 'Я люблю есть печенье'),
                       SizedBox(height: 16),
-                      _buildInfoRow(Icons.email, 'Email', 'ivanov@school123.ru'),
+                      _buildInfoRow('https://i.ytimg.com/vi/RIwUVygucO4/maxresdefault.jpg', 'Школа №123', 'С углубленным изучением математики'),
                       SizedBox(height: 16),
-                      _buildInfoRow(Icons.phone, 'Телефон', '+7 (999) 123-45-67'),
+                      _buildInfoRow('https://storage.myseldon.com/news-pict-3c/3C8882CBFAE5963A29CDE6A320BB271E', 'Email', 'ivanov@school123.ru'),
+                      SizedBox(height: 16),
+                      _buildInfoRow('https://i.pinimg.com/originals/a1/ae/d9/a1aed90e81aca243355a45a092d35f3c.jpg', 'Телефон', '+7 (999) 123-45-67'),
                     ],
                   ),
                 ),
@@ -120,7 +145,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String title, String subtitle) {
+  Widget _buildInfoRow(String url, String title, String subtitle) {
     return Row(
       children: [
         Container(
@@ -130,7 +155,47 @@ class ProfileScreen extends StatelessWidget {
             color: Colors.blue.withOpacity(0.1),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, color: Colors.blue, size: 20),
+          child: CachedNetworkImage(imageUrl: url,
+            imageBuilder: (context, imageProvider) => Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.blue, width: 1.5),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.blue.withOpacity(0.3),
+                    blurRadius: 10,
+                    spreadRadius: 2,
+                  ),
+                ],
+                image: DecorationImage(
+                  image: imageProvider,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            placeholder: (context, url) => Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.blue, width: 3),
+                color: Colors.grey[300],
+              ),
+              child: Icon(Icons.person_outline, size: 60,color: Colors.blue),
+            ),
+            errorWidget: (context, url, error) => Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.blue, width: 3),
+                color: Colors.grey[300],
+              ),
+              child: Icon(Icons.error_outline, size: 60, color: Colors.red),
+            ),
+          ),
         ),
         SizedBox(width: 16),
         Expanded(

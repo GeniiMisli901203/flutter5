@@ -1,4 +1,6 @@
+// lib/shared/widgets/bottom_nav_bar.dart
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../state/app_state.dart';
 
 class BottomNavBar extends StatelessWidget {
@@ -8,66 +10,41 @@ class BottomNavBar extends StatelessWidget {
   const BottomNavBar({
     required this.currentScreen,
     required this.onTabSelected,
-  });
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       currentIndex: currentScreen.index,
-      onTap: (index) => onTabSelected(AppScreen.values[index]),
-      items: [
+      onTap: (index) {
+        final screen = AppScreen.values[index];
+        onTabSelected(screen);
+
+        // Навигация с помощью GoRouter
+        switch (screen) {
+          case AppScreen.news:
+            context.go('/news');
+            break;
+          case AppScreen.schedule:
+            context.go('/schedule');
+            break;
+          case AppScreen.profile:
+            context.go('/profile');
+            break;
+        }
+      },
+      items: const [
         BottomNavigationBarItem(
-          icon: AnimatedContainer(
-            duration: Duration(milliseconds: 300),
-            padding: EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: currentScreen == AppScreen.news
-                  ? Colors.blue.withOpacity(0.1)
-                  : Colors.transparent,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(Icons.article,
-              color: currentScreen == AppScreen.news
-                  ? Colors.blue
-                  : Colors.grey,
-            ),
-          ),
+          icon: Icon(Icons.article),
           label: 'Новости',
         ),
         BottomNavigationBarItem(
-          icon: AnimatedContainer(
-            duration: Duration(milliseconds: 300),
-            padding: EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: currentScreen == AppScreen.schedule
-                  ? Colors.blue.withOpacity(0.1)
-                  : Colors.transparent,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(Icons.schedule,
-              color: currentScreen == AppScreen.schedule
-                  ? Colors.blue
-                  : Colors.grey,
-            ),
-          ),
+          icon: Icon(Icons.schedule),
           label: 'Расписание',
         ),
         BottomNavigationBarItem(
-          icon: AnimatedContainer(
-            duration: Duration(milliseconds: 300),
-            padding: EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: currentScreen == AppScreen.profile
-                  ? Colors.blue.withOpacity(0.1)
-                  : Colors.transparent,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(Icons.person,
-              color: currentScreen == AppScreen.profile
-                  ? Colors.blue
-                  : Colors.grey,
-            ),
-          ),
+          icon: Icon(Icons.person),
           label: 'Профиль',
         ),
       ],

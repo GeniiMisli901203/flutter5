@@ -316,6 +316,10 @@ class AppState extends ChangeNotifier {
     _sortLessonsByTime(newDay);
   }
 
+  void removeLesson(String id) {
+    deleteLesson(id); // Просто вызываем существующий метод
+  }
+
   void _sortLessonsByTime(int day) {
     _lessonsByDay[day].sort((a, b) {
       final aStart = a.time.split('-').first;
